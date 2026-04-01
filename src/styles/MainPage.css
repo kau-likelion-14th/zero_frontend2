@@ -1,0 +1,7 @@
+.mainpage-container{
+    display: flex;
+    justify-content: center; /* 중앙 정렬 추가*/
+    align-items: center;
+    padding: 100px 0px; /**/
+    gap: 200px;
+}
