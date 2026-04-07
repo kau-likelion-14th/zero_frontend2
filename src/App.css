@@ -43,3 +43,7 @@
   src: url(./assets/font/Paperlogy-9Black.ttf);
   font-weight: 900;
 }
+
+* {
+  font-family: 'Paperlogy', sans-serif;
+}
