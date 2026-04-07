@@ -1,21 +1,19 @@
 .footer {
-    position: fixed; 
-    bottom: 0;
-    left: 0;
+
     width: 100%;
-    z-index: 1000;
     background-color: #DFF3EA; 
     border-top: 1px solid #DFF3EA;
-    padding: 35px 0; 
+    padding: 50px 0;
     font-family: "Paperlogy", sans-serif;
+
 }
 
 .footer-container {
-    max-width: 1200px;
-    margin: 0;
-    padding: 0 40px;
+    max-width: 1440px;
+    margin: 0; /* 원래 코드의 정렬 유지 */
+    padding: 0 30px;
     display: flex;
-    flex-direction: column;
+    flex-direction: column; /* 원래의 세로 정렬 유지 */
     gap: 25px;
 }
 
@@ -48,7 +46,6 @@
     color: #000000;
 }
 
-
 .footer-right {
     display: flex;
     flex-direction: column; 
@@ -56,11 +53,11 @@
     margin-top: 10px;
 }
 
-
 .footer-info-group {
     display: flex;
     column-gap: 35px;  
     row-gap: 8px;
+    flex-wrap: wrap; /* 정보가 많을 때를 대비한 최소한의 안전장치 */
 }
 
 .footer-row {
