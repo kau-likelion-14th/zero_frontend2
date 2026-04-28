@@ -1,0 +1,185 @@
+.mypage-container {
+    max-width: 1100px;
+    margin: 110px auto 50px;
+    padding: 0 80px;
+    font-family: 'Paperlogy', sans-serif;
+}
+
+.profile-section {
+    margin-bottom: 50px;
+}
+
+.profile-top {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+    margin-bottom: 35px;
+}
+
+.profile-img-wrap {
+    position: relative;
+    width: 180px;
+    height: 180px;
+    flex-shrink: 0;
+    background: #eeeeee;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.profile-img {
+    width: 130px;
+    height: 130px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.profile-edit-btn {
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: none;
+    background: #d0d0d0;
+    color: #555;
+    font-size: 15px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+}
+
+.profile-nickname {
+    font-size: 28px;
+    font-weight: 700;
+    color: #111;
+    flex: 1;
+    align-self: center;
+}
+
+.profile-save-btn {
+    background: #3b9de8;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 14px 52px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'Paperlogy', sans-serif;
+    white-space: nowrap;
+    margin-left: auto;
+}
+
+.profile-save-btn:hover { background: #2176c7; }
+
+.profile-inputs {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.input-label {
+    font-size: 15px;
+    font-weight: 600;
+    color: #222;
+    margin-top: 14px;
+}
+
+.profile-input {
+    width: 100%;
+    max-width: 500px;
+    padding: 13px 16px;
+    border: 1.5px solid #d8d8d8;
+    border-radius: 10px;
+    font-size: 14px;
+    font-family: 'Paperlogy', sans-serif;
+    outline: none;
+    color: #333;
+    background: #fff;
+    box-sizing: border-box;
+}
+
+.profile-input:focus { border-color: #3b9de8; }
+
+.song-input-wrap {
+    display: flex;
+    align-items: center;
+    max-width: 500px;
+    border: 1.5px solid #d8d8d8;
+    border-radius: 10px;
+    padding: 0 14px;
+    background: #ffffff;
+    gap: 8px;
+}
+
+.song-icon {
+    font-size: 16px;
+    color: #888888;
+    flex-shrink: 0;
+}
+
+.song-input {
+    flex: 1;
+    border: none;
+    outline: none;
+    font-size: 14px;
+    font-family: 'Paperlogy', sans-serif;
+    padding: 13px 0;
+    color: #333333;
+    background: transparent;
+}
+
+.song-input-wrap:focus-within { border-color: #3b9de8; }
+
+.song-search-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+}
+
+.status-section {
+    display: flex;
+    gap: 20px;
+}
+
+.stat-card {
+    flex: 1;
+    background: #f2f2f2;
+    border-radius: 16px;
+    padding: 30px 28px 50px;
+}
+
+.stat-card-top {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 28px;
+}
+
+.stat-icon { font-size: 22px; }
+
+.stat-title {
+    font-size: 15px;
+    font-weight: 500;
+    color: #555;
+}
+
+.stat-value {
+    font-size: 26px;
+    font-weight: 700;
+    color: #111;
+    padding-left: 2px;
+}
+
+.stat-unit {
+    font-size: 17px;
+    font-weight: 400;
+}

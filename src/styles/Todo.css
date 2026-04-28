@@ -43,7 +43,6 @@
   cursor: pointer;
 }
 
-
 .checkbox {
   width: 20px;
   height: 20px;
@@ -56,6 +55,7 @@
   font-size: 12px;
   color: #ffffff;
   padding: 0;
+  flex-shrink: 0;
 }
 
 .checkbox.checked {
@@ -70,7 +70,7 @@
 .todo-text {
   font-size: 16px;
   font-weight: 400;
-  align-items: center;
+  flex: 1;
 }
 
 .todo-category {
@@ -78,6 +78,7 @@
   padding: 4px 20px;
   border-radius: 20px; 
   font-weight: 500;
+  flex-shrink: 0;
 }
 
 .modal-overlay {
@@ -211,9 +212,8 @@
 
 .leftbutton.disabled {
   border-color: #FF383C;
-  color: #bbb;
+  color: #FF383C;
   cursor: default;
-  color:#FF383C;
 }
 
 .leftbutton:not(.disabled):hover {
@@ -287,12 +287,10 @@
   height: 52px;
   box-sizing: border-box;
   letter-spacing: -0.3px;
-  font-weight: 500;
   font-size:14px;
 }
 
 .date-input::-webkit-calendar-picker-indicator {
-
   cursor: pointer;
   width: 18px;
   height: 18px;
@@ -306,7 +304,6 @@
   padding-right: 4px;
 }
 
-
 .leftbutton2 {
   flex: 1;
   padding: 16px 0;
@@ -317,7 +314,6 @@
   font-size: 17px;
   font-weight: 600;
   cursor: pointer;
-
 }
 
 .leftbutton2:hover {
