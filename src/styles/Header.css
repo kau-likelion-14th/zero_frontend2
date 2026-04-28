@@ -9,7 +9,7 @@
     padding: 0 32px;
     border-radius:36px;
 
-    background: #DFF3EA;
+    background: rgba(223, 243, 234, 0.82);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
 
@@ -25,20 +25,17 @@
     gap:12px;
     margin-left:24px;
     z-index: 2;
-
 }
 
 .header-logo{
     width: 36px;
     height:36px;
-
 }
 
 .header-title{
     font-size:22px;
     font-weight: 700;
     color: #1c1c1c;
-
 }
 
 .header-nav{
@@ -80,19 +77,16 @@
     gap: 12px;
     margin-right: 24px;
     z-index:2;
-
 }
 
 .user-name{
     font-size:18px;
     color: #1c1c1c;
     font-weight: 500;
-
 }
 
 .logout-icon{
     width:20px;
     height: 20px;
     cursor: pointer;
-
 }

@@ -10,10 +10,10 @@
 
 .footer-container {
     max-width: 1440px;
-    margin: 0; /* 원래 코드의 정렬 유지 */
+    margin: 0; 
     padding: 0 30px;
     display: flex;
-    flex-direction: column; /* 원래의 세로 정렬 유지 */
+    flex-direction: column;
     gap: 25px;
 }
 
@@ -57,7 +57,7 @@
     display: flex;
     column-gap: 35px;  
     row-gap: 8px;
-    flex-wrap: wrap; /* 정보가 많을 때를 대비한 최소한의 안전장치 */
+    flex-wrap: wrap;
 }
 
 .footer-row {
