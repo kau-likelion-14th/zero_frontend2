@@ -68,5 +68,5 @@ npm run build
 - 세션: https://app.notion.com/p/API-408e2a6ef56380838beceb5bba7a08a7
 - 과제: https://app.notion.com/p/API-409e2a6ef563802eadace7150ebed004
 
-제출 브랜치: codex/frontend-friend-api-assignment
+제출 브랜치: friend-page-api-assignment
 배포와 머지는 수행하지 않습니다.
