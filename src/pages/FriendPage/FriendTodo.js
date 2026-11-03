@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React from "react";
 
 import "../../styles/Todo.css";
 import "../../styles/FriendTodo.css";
@@ -23,13 +23,6 @@ const dummyCategories = {
 const FriendTodo = ({ title = "To do List" }) => {
   const todos = dummyTodos;
   const categories = dummyCategories;
-
-  // 전체/완료 개수 계산 (지금은 UI에 안 띄우지만 나중에 쓸 수도)
-  const counts = useMemo(() => {
-    const total = todos.length;
-    const done = todos.filter((t) => t.completed).length;
-    return { total, done };
-  }, [todos]);
 
   return (
     <div className="friend-todo">

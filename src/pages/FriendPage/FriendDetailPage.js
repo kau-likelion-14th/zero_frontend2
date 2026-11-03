@@ -74,7 +74,7 @@ function FriendDetailPage() {
 
   // 캘린더에서 클릭된 날짜 - 이게 바뀌면 오른쪽 투두 리스트도 같이 바뀜
   const [selectedDate, setSelectedDate] = useState(new Date("2026-05-04"));
-  const [viewDate, setViewDate] = useState(new Date("2026-05-04"));  // 지금 보고있는 달
+  const [, setViewDate] = useState(new Date("2026-05-04"));  // 지금 보고있는 달
 
   const [todosByDate] = useState(dummyTodosByDate);
   const [remainingByDate] = useState(dummyRemainingByDate);

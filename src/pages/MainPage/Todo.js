@@ -1,4 +1,4 @@
-import React, {useMemo, useState} from "react";
+import React, {useState} from "react";
 import "../../styles/Todo.css";
 import TodoModal from "./TodoModal";
 
@@ -103,12 +103,6 @@ const Todo = ({ selectedDate, todosByDate, setTodosByDate }) => {
         setTodos((prev) => prev.filter((t) => t.id !== editingTodo.id));
         setIsModalOpen(false);
     };
-
-    const counts = useMemo(() => {
-        const total = todos.length;
-        const done = todos.filter((t) => t.completed).length;
-        return { total, done };
-    }, [todos]);
 
     return (
         <div className="todo-container">

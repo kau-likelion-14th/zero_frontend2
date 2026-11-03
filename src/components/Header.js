@@ -5,12 +5,13 @@ import LogoutIcon from "../assets/icon/logout.png";
 import { NavLink, useNavigate } from "react-router-dom";
 import api from "../Api";
 import config from "../Config";
-import {useState} from "react";
+import {useRef, useState} from "react";
 
 
 function Header() {
     const navigate = useNavigate();
     const [loggingOut, setLoggingOut] = useState(false);
+    const loggingOutRef = useRef(false);
 
     let userName = "";
 
@@ -23,8 +24,9 @@ function Header() {
         
     }
 
-    const handlogout = async (Event) =>{
-        if(loggingOut) return;
+    const handlogout = async () =>{
+        if(loggingOutRef.current) return;
+        loggingOutRef.current = true;
         setLoggingOut(true);
 
         try{
@@ -42,12 +44,14 @@ function Header() {
             window.dispatchEvent(new Event("auth:changed"));
 
             navigate("/login", {replace: true});
-        } catch {
-            alert("로그아웃에 실패했습니다.", Event)
+        } catch (error) {
+            console.error("로그아웃 오류: ", error);
+            alert("로그아웃에 실패했습니다.");
         } finally {
+            loggingOutRef.current = false;
             setLoggingOut(false);
         }
-    }
+    };
     
     return (
         <header className="header">
@@ -78,7 +82,13 @@ function Header() {
                 <span className="user-name">{userName ? `${userName}님` : ""}
                 </span>
                 <img src={LogoutIcon} alt="로그아웃" className="logout-icon" onClick={handlogout}
-                role="button" tabIndex={0} aria-disabled={loggingOut}/>
+                role="button" tabIndex={0} aria-disabled={loggingOut}
+                onKeyDown={(event) => {
+                    if (event.key === "Enter" || event.key === " ") {
+                        event.preventDefault();
+                        handlogout();
+                    }
+                }}/>
 
             </div>
 
