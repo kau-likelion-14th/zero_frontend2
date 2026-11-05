@@ -1,193 +1,168 @@
-import React, { useMemo, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-
+import React, { useEffect, useMemo, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import api from "../../Api";
+import config from "../../Config";
 import FriendCalendar from "./FriendCalendar";
 import FriendTodo from "./FriendTodo";
-
 import "../../styles/FriendDetailPage.css";
 
-// 카테고리별 색상 → FriendTodo로 props 넘겨서 라벨 배경색으로 씀
 const Categories = {
-  공부:   { backgroundColor: "#E5F8F1", color: "#333" },
-  일상:   { backgroundColor: "#FFC8BE", color: "#333" },
+  공부: { backgroundColor: "#E5F8F1", color: "#333" },
+  일상: { backgroundColor: "#FFC8BE", color: "#333" },
   동아리: { backgroundColor: "#B6DAFF", color: "#333" },
 };
 
-// Date → "YYYY-MM-DD" 변환 (key 매칭용)
 const toDateKey = (date) => {
-  const y = date.getFullYear();
-  const m = String(date.getMonth() + 1).padStart(2, "0");
-  const d = String(date.getDate()).padStart(2, "0");
-  return `${y}-${m}-${d}`;
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
 };
 
-// 이전 페이지에서 friend 안 넘겨준 경우 대비한 기본값
-const dummyFriend = {
-  followId: "1",
-  name: "나나",
-  tag: "1234",
-  bio: "안녕하세요! 저는 나나입니다.",
-  profileImage: null,
-};
+function useFriendResource(url, params, validate, retry) {
+  const query = JSON.stringify(params);
+  const requestKey = JSON.stringify([url, query, retry]);
+  const [state, setState] = useState({
+    key: null, loading: true, error: "", value: null,
+  });
 
-// 친구가 저장한 곡 더미 (상단 음악 카드용)
-const dummySavedSongs = [
-  { id: 1, title: "Ditto", artist: "NewJeans", imageUrl: null },
-];
+  useEffect(() => {
+    let active = true;
+    const controller = new AbortController();
+    setState({ key: requestKey, loading: true, error: "", value: null });
 
-// 친구 투두 더미
-const dummyTodosByDate = {
-  "2026-05-04": [
-    { id: 1, text: "프론트 보충자료 읽기",        category: "공부",   completed: true },
-    { id: 2, text: "FriendDetailPage 주석 달기",  category: "공부",   completed: false },
-  ],
-  "2026-05-06": [
-    { id: 3, text: "친구 페이지 과제 제출",       category: "동아리", completed: true },
-  ],
-  "2026-05-10": [
-    { id: 4, text: "React 복습하기",              category: "공부",   completed: false },
-    { id: 5, text: "동아리 회의",                 category: "동아리", completed: false },
-    { id: 6, text: "산책하기",                    category: "일상",   completed: true },
-  ],
-};
+    api.get(url, { params: JSON.parse(query), signal: controller.signal })
+      .then(({ data }) => {
+        if (data?.isSuccess === false || !validate(data?.result)) {
+          throw new Error("잘못된 서버 응답입니다.");
+        }
+        if (active) {
+          setState({ key: requestKey, loading: false, error: "", value: data.result });
+        }
+      })
+      .catch(() => {
+        if (active) {
+          setState({
+            key: requestKey, loading: false,
+            error: "데이터를 불러오지 못했습니다.", value: null,
+          });
+        }
+      });
 
-// 캘린더에 표시할 "남은 할 일 개수" 더미
-const dummyRemainingByDate = {
-  "2026-05-04": { hasTodo: true, remaining: 1 },
-  "2026-05-06": { hasTodo: true, remaining: 0 },
-  "2026-05-10": { hasTodo: true, remaining: 2 },
-};
+    return () => {
+      active = false;
+      controller.abort();
+    };
+  }, [url, query, validate, requestKey]);
 
-// 친구 상세페이지 - 프로필 + 저장곡 + 캘린더 + 투두
-// App.js의 /friends/:id 라우트로 들어옴
-// FriendList나 FriendSearch에서 navigate로 진입할 때 friend 객체 같이 넘어옴
+  // 다른 친구나 날짜로 바뀐 순간에도 이전 요청의 결과를 표시하지 않습니다.
+  return state.key === requestKey
+    ? state
+    : { loading: true, error: "", value: null };
+}
+
+const validProfile = (value) => typeof value?.username === "string";
+const validTodos = (value) =>
+  Array.isArray(value) &&
+  value.every((todo) =>
+    todo?.todoId != null &&
+    typeof todo.description === "string" &&
+    typeof todo.completed === "boolean"
+  );
+const validCalendar = (value) =>
+  Array.isArray(value?.days) &&
+  value.days.every((day) =>
+    typeof day?.date === "string" &&
+    typeof day.hasTodo === "boolean" &&
+    Number.isFinite(day.remaining) && day.remaining >= 0
+  );
+
+function ResourceState({ resource, onRetry }) {
+  if (resource.loading) return <p role="status">불러오는 중...</p>;
+  if (resource.error) {
+    return (
+      <div>
+        <p role="alert">{resource.error}</p>
+        <button type="button" onClick={onRetry}>다시 시도</button>
+      </div>
+    );
+  }
+  return null;
+}
+
 function FriendDetailPage() {
   const navigate = useNavigate();
-  const location = useLocation();
+  const { id } = useParams();
+  const [selectedDate, setSelectedDate] = useState(() => new Date());
+  const [viewDate, setViewDate] = useState(selectedDate);
+  const [retries, setRetries] = useState({ profile: 0, todos: 0, calendar: 0 });
+  const retry = (key) => setRetries((prev) => ({ ...prev, [key]: prev[key] + 1 }));
 
-  // 이전 페이지에서 navigate state로 넘긴 friend 꺼냄
-  const passedFriend = location.state?.friend ?? null;
-
-  // 넘어온 게 있으면 그거 쓰고, 없으면 더미 친구
-  const [friend] = useState(passedFriend ?? dummyFriend);
-  const [savedSongs] = useState(dummySavedSongs);
-
-  // 캘린더에서 클릭된 날짜 - 이게 바뀌면 오른쪽 투두 리스트도 같이 바뀜
-  const [selectedDate, setSelectedDate] = useState(new Date("2026-05-04"));
-  const [, setViewDate] = useState(new Date("2026-05-04"));  // 지금 보고있는 달
-
-  const [todosByDate] = useState(dummyTodosByDate);
-  const [remainingByDate] = useState(dummyRemainingByDate);
-
-  // 저장곡 중 가장 최근 1개 → 상단 음악 카드에 표시
-  const latestSong = useMemo(() => {
-    if (!Array.isArray(savedSongs) || savedSongs.length === 0) return null;
-    return savedSongs[0];
-  }, [savedSongs]);
-
-  // 선택된 날짜의 투두만 추림 → FriendTodo로 넘김
-  // selectedDate 바뀌면 자동으로 다시 계산됨
-  const todos = useMemo(() => {
-    const key = toDateKey(selectedDate);
-    return todosByDate[key] ?? [];
-  }, [selectedDate, todosByDate]);
+  const profile = useFriendResource(
+    config.FOLLOW.PROFILE(id), {}, validProfile, retries.profile
+  );
+  const todoResource = useFriendResource(
+    config.FOLLOW.TODOS(id), { date: toDateKey(selectedDate) }, validTodos, retries.todos
+  );
+  const calendarResource = useFriendResource(
+    config.FOLLOW.CALENDAR(id),
+    { year: viewDate.getFullYear(), month: viewDate.getMonth() + 1 },
+    validCalendar, retries.calendar
+  );
+  const [name, ...tags] = (profile.value?.username || "").split("#");
+  const todos = useMemo(() => (todoResource.value || []).map((todo) => ({
+    id: todo.todoId, text: todo.description,
+    category: todo.categoryName, completed: todo.completed,
+  })), [todoResource.value]);
+  const remainingByDate = useMemo(() => Object.fromEntries(
+    (calendarResource.value?.days || []).map((day) => [day.date, {
+      hasTodo: day.hasTodo, remaining: day.remaining,
+    }])
+  ), [calendarResource.value]);
 
   return (
     <div className="friend-detail-page">
       <div className="friend-detail-page__inner">
         <div className="friend-detail-page__top">
-
-          {/* 뒤로가기 - navigate(-1)은 브라우저 히스토리 한 칸 뒤로 */}
-          <button
-            type="button"
-            className="friend-detail-page__back"
-            aria-label="뒤로가기"
-            onClick={() => navigate(-1)}
-          >
-            ‹
-          </button>
-
-          {/* 친구 프로필 영역 */}
-          <div className="friend-detail-page__profile">
+          <button type="button" className="friend-detail-page__back"
+            aria-label="뒤로가기" onClick={() => navigate(-1)}>‹</button>
+          <section className="friend-detail-page__profile" aria-label="친구 프로필">
             <div className="friend-detail-page__avatar" aria-hidden="true">
-              {friend?.profileImage ? (
-                <img
-                  src={friend.profileImage}
-                  alt="profile"
-                  style={{ width: "100%", height: "100%", borderRadius: "50%", objectFit: "cover" }}
-                />
-              ) : (
-                <UserIcon />
+              {profile.value?.profileImageUrl ? (
+                <img src={profile.value.profileImageUrl} alt=""
+                  style={{ width: "100%", height: "100%", borderRadius: "50%", objectFit: "cover" }} />
+              ) : <UserIcon />}
+            </div>
+            <div className="friend-detail-page__profile-info">
+              <ResourceState resource={profile} onRetry={() => retry("profile")} />
+              {profile.value && (
+                <>
+                  <div className="friend-detail-page__name-line">
+                    <span className="friend-detail-page__name">{name || "이름 없음"}</span>
+                    {tags.length > 0 && (
+                      <span className="friend-detail-page__tag">#{tags.join("#")}</span>
+                    )}
+                  </div>
+                  <div className="friend-detail-page__bio">
+                    {profile.value.introduction || "소개글이 없습니다."}
+                  </div>
+                </>
               )}
             </div>
-
-            <div className="friend-detail-page__profile-info">
-              <div className="friend-detail-page__name-line">
-                <span className="friend-detail-page__name">{friend?.name || " "}</span>
-              </div>
-              <div className="friend-detail-page__bio">
-                {friend?.bio || "한 줄 소개"}
-              </div>
-            </div>
-          </div>
-
-          {/* 친구가 저장한 최근 곡 */}
-          {/* latestSong 있으면 카드, 없으면 안내문 */}
-          <div className="friend-detail-page__songs-inline">
-            {latestSong ? (
-              <div className="friend-detail-page__song-inline-item">
-                <div className="friend-detail-page__song-inline-cover">
-                  {latestSong?.imageUrl ? (
-                    <img
-                      src={latestSong.imageUrl}
-                      alt={latestSong.title || "album"}
-                      style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "10px" }}
-                    />
-                  ) : null}
-                </div>
-
-                <div className="friend-detail-page__song-inline-info">
-                  <div className="friend-detail-page__song-inline-title">
-                    {latestSong?.title || "제목 없음"}
-                  </div>
-                  <div className="friend-detail-page__song-inline-artist">
-                    {latestSong?.artist || "아티스트 정보 없음"}
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <div className="friend-detail-page__songs-inline-empty">
-                저장한 곡이 없습니다.
-              </div>
-            )}
-          </div>
+          </section>
         </div>
-
-        {/* 캘린더 + 투두 (좌/우 배치) */}
         <div className="friend-detail-page__grid">
-
-          {/* 왼쪽 캘린더 - 날짜 클릭하면 setSelectedDate 실행 → 오른쪽 투두 같이 바뀜 */}
-          <div className="friend-detail-page__calendar">
-            <FriendCalendar
-              initialDate={selectedDate}
-              onDateChange={(date) => date && setSelectedDate(date)}
-              onMonthChange={(date) => {
-                if (!date) return;
-                setViewDate(date);
-              }}
-              todosByDate={todosByDate}
-              remainingByDate={remainingByDate}
-            />
-          </div>
-
-          {/* 오른쪽 투두 - selectedDate 기준 todos만 내려보냄 */}
-          <div className="friend-detail-page__todo">
-            <FriendTodo
-              title="To do List"
-              todos={todos}
-              categories={Categories}
-            />
-          </div>
+          <section className="friend-detail-page__calendar" aria-label="친구 캘린더">
+            <ResourceState resource={calendarResource} onRetry={() => retry("calendar")} />
+            <FriendCalendar initialDate={selectedDate} onDateChange={setSelectedDate}
+              onMonthChange={setViewDate} remainingByDate={remainingByDate} />
+          </section>
+          <section className="friend-detail-page__todo" aria-label="친구 할 일">
+            <ResourceState resource={todoResource} onRetry={() => retry("todos")} />
+            {!todoResource.loading && !todoResource.error && (
+              <FriendTodo title="To do List" todos={todos} categories={Categories} />
+            )}
+          </section>
         </div>
       </div>
     </div>
@@ -197,10 +172,11 @@ function FriendDetailPage() {
 function UserIcon() {
   return (
     <svg width="34" height="34" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path d="M12 12c2.761 0 5-2.239 5-5S14.761 2 12 2 7 4.239 7 7s2.239 5 5 5Z" fill="#ffffff" opacity="0.9"/>
-      <path d="M4 22c0-4.418 3.582-8 8-8s8 3.582 8 8" stroke="#ffffff" strokeWidth="2" strokeLinecap="round"/>
+      <path d="M12 12c2.761 0 5-2.239 5-5S14.761 2 12 2 7 4.239 7 7s2.239 5 5 5Z"
+        fill="#ffffff" opacity="0.9" />
+      <path d="M4 22c0-4.418 3.582-8 8-8s8 3.582 8 8"
+        stroke="#ffffff" strokeWidth="2" strokeLinecap="round" />
     </svg>
   );
 }
-
 export default FriendDetailPage;
