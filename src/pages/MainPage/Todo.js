@@ -25,7 +25,7 @@ export default function Todo({ dateKey, resource, saving, saveFailed, onChangeCo
         <button
           className="todo-add"
           type="button"
-          aria-label="할 일 카테고리 보기"
+          aria-label="할 일 추가하기"
           aria-haspopup="dialog"
           onClick={() => setModal({})}
         >
@@ -51,7 +51,7 @@ export default function Todo({ dateKey, resource, saving, saveFailed, onChangeCo
             <button
               className="todo-text todo-text-button"
               type="button"
-              aria-label={`할 일 보기: ${todo.description}`}
+              aria-label={`할 일 수정하기: ${todo.description}`}
               aria-haspopup="dialog"
               onClick={() => setModal({ todo })}
             >

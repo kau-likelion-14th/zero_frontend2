@@ -33,9 +33,14 @@ export default function TodoModal({ todo, onClose }) {
         closeDialog();
       }}
     >
-      <h2 className="modal-title" id="todo-modal-title">
-        {todo ? "할 일 보기" : "할 일 카테고리"}
-      </h2>
+      <div className="todo-modal-header">
+        <h2 className="modal-title" id="todo-modal-title">
+          {todo ? "할 일 수정하기" : "할 일 추가하기"}
+        </h2>
+        <button type="button" className="todo-modal-close" aria-label="닫기" onClick={closeDialog}>
+          ×
+        </button>
+      </div>
       <div className="modal-section">
         <div className="modal-label" id="todo-category-label">카테고리</div>
         <TodoResourceStatus resource={categories} label="카테고리를" />
@@ -56,16 +61,27 @@ export default function TodoModal({ todo, onClose }) {
           </div>
         )}
       </div>
-      {todo && (
-        <div className="modal-section">
-          <div className="modal-label">내용</div>
-          <p className="input-wrapper todo-description-preview">{todo.description}</p>
+      <div className="modal-section">
+        <label className="modal-label" htmlFor="todo-description">내용</label>
+        <div className="input-wrapper">
+          <input
+            id="todo-description"
+            className="text-input"
+            type="text"
+            placeholder="내용을 입력해주세요"
+            defaultValue={todo?.description ?? ""}
+          />
         </div>
-      )}
-      <p className="todo-category-note">카테고리 선택은 미리보기입니다.</p>
-      <div className="modal-actions">
-        <button type="button" className="rightbutton" onClick={closeDialog}>닫기</button>
       </div>
+      <button type="button" className="routine-row" disabled>
+        <span className="routine-label">루틴 등록하기</span>
+        <span className="routine-button" aria-hidden="true">›</span>
+      </button>
+      <div className="modal-actions">
+        <button type="button" className="leftbutton disabled" disabled>삭제</button>
+        <button type="button" className="rightbutton disabled" disabled>저장</button>
+      </div>
+      <p className="todo-category-note">입력한 내용과 카테고리는 이 화면에서 미리 볼 수 있습니다.</p>
     </dialog>
   );
 }
