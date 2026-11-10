@@ -13,7 +13,7 @@ const categoryColors = {
 };
 
 export default function Todo({ dateKey, resource, saving, saveFailed, onChangeCompletion }) {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modal, setModal] = useState(null);
 
   return (
     <section className="todo-container" aria-labelledby="todo-title">
@@ -27,7 +27,7 @@ export default function Todo({ dateKey, resource, saving, saveFailed, onChangeCo
           type="button"
           aria-label="할 일 카테고리 보기"
           aria-haspopup="dialog"
-          onClick={() => setIsModalOpen(true)}
+          onClick={() => setModal({})}
         >
           +
         </button>
@@ -48,7 +48,15 @@ export default function Todo({ dateKey, resource, saving, saveFailed, onChangeCo
               disabled={saving}
               onClick={() => onChangeCompletion(todo)}
             />
-            <div className="todo-text">{todo.description}</div>
+            <button
+              className="todo-text todo-text-button"
+              type="button"
+              aria-label={`할 일 보기: ${todo.description}`}
+              aria-haspopup="dialog"
+              onClick={() => setModal({ todo })}
+            >
+              {todo.description}
+            </button>
             <div
               className="todo-category"
               style={{ backgroundColor: categoryColors[todo.categoryName] || "#F1F1F1" }}
@@ -58,7 +66,7 @@ export default function Todo({ dateKey, resource, saving, saveFailed, onChangeCo
           </div>
         ))}
       </div>
-      {isModalOpen && <TodoModal onClose={() => setIsModalOpen(false)} />}
+      {modal && <TodoModal todo={modal.todo} onClose={() => setModal(null)} />}
     </section>
   );
 }

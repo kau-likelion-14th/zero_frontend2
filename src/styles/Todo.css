@@ -138,11 +138,34 @@
 }
 
 .todo-category-options .modal-categoryitem {
-  padding: 8px 14px;
+  min-width: 0;
+}
+
+.todo-category-options .modal-categoryitem span {
+  padding: 6px 12px;
   border-radius: 20px;
   background: #eaf4ff;
   color: #19568d;
-  cursor: default;
+}
+
+.todo-text-button {
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.todo-text-button:hover {
+  text-decoration: underline;
+}
+
+.todo-description-preview {
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
 }
 
 .todo-category-note {
