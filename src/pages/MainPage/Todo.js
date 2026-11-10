@@ -1,149 +1,64 @@
-import React, {useState} from "react";
+import { useState } from "react";
 import "../../styles/Todo.css";
 import TodoModal from "./TodoModal";
+import TodoResourceStatus from "./TodoResourceStatus";
 
-const uid = () => Date.now() + Math.random();
-
-const Categories = {
-    공부: { backgroundColor: '#E5F8F1', color: '#333' },
-    운동: { backgroundColor: '#FFC8BE', color: '#333' },
-    동아리: { backgroundColor: '#B6DAFF', color: '#333' },
+const categoryColors = {
+  공부: "#E5F8F1",
+  운동: "#FFC8BE",
+  동아리: "#B6DAFF",
+  독서: "#F2E9FF",
+  자기계발: "#E1F0FF",
+  취미: "#FFF0D6",
 };
 
-const toDateKey = (date) => {
-    const y = date.getFullYear();
-    const m = String(date.getMonth() + 1).padStart(2, "0");
-    const d = String(date.getDate()).padStart(2, "0");
-    return `${y}-${m}-${d}`;
-};
+export default function Todo({ dateKey, resource, saving, saveFailed, onChangeCompletion }) {
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-const DAY_TO_JS = [1, 2, 3, 4, 5, 6, 0];
-
-const Todo = ({ selectedDate, todosByDate, setTodosByDate }) => {
-    const dateKey = toDateKey(selectedDate);
-    const todos = todosByDate[dateKey] ?? [];
-
-    const setTodos = (updater) => {
-        setTodosByDate((prev) => {
-            const current = prev[dateKey] ?? [];
-            const nextTodos = typeof updater === "function" ? updater(current) : updater;
-            return { ...prev, [dateKey]: nextTodos };
-        });
-    };
-
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [editingTodo, setEditingTodo] = useState(null);
-
-    const openModal = () => {
-        setEditingTodo(null);
-        setIsModalOpen(true);
-    };
-
-    const openEditModal = (todo) => {
-        setEditingTodo(todo);
-        setIsModalOpen(true);
-    };
-
-    const TodoCompleted = (id) => {
-        setTodos((prev) =>
-            prev.map((t) =>
-                t.id === id ? { ...t, completed: !t.completed } : t
-            )
-        );
-    };
-
-    const handledSaveTodo = ({text, category, routine}) => {
-        if (editingTodo) {
-            setTodos((prev) =>
-                prev.map((t) =>
-                    t.id === editingTodo.id
-                        ? { ...t, text, category, routine }
-                        : t
-                )
-            );
-        } else if (
-            routine &&
-            routine.startDate &&
-            routine.endDate &&
-            routine.repeatDays !== null
-        ) {
-
-            const targetJsDay = DAY_TO_JS[routine.repeatDays];
-            const start = new Date(routine.startDate);
-            const end = new Date(routine.endDate);
-
-            setTodosByDate((prev) => {
-                const updated = { ...prev };
-                const cur = new Date(start);
-                while (cur <= end) {
-                    if (cur.getDay() === targetJsDay) {
-                        const key = toDateKey(cur);
-                        const existing = updated[key] ?? [];
-                        updated[key] = [
-                            ...existing,
-                            { id: uid(), text, category, completed: false, routine },
-                        ];
-                    }
-                    cur.setDate(cur.getDate() + 1);
-                }
-                return updated;
-            });
-        } else {
-
-            setTodos((prev) => [
-                ...prev,
-                { id: uid(), text, category, completed: false },
-            ]);
-        }
-        setIsModalOpen(false);
-    };
-
-    const handledDeleteTodo = () => {
-        if (!editingTodo) return;
-        setTodos((prev) => prev.filter((t) => t.id !== editingTodo.id));
-        setIsModalOpen(false);
-    };
-
-    return (
-        <div className="todo-container">
-            <div className="todo-header">
-                <div className="todo-title">To do List</div>
-                <button className="todo-add" onClick={openModal}>+</button>
-            </div>
-            <div className="todo-list">
-                {todos.map((t) => (
-                    <div
-                        key={t.id}
-                        className={`todo-item ${t.completed ? 'done' : ''}`}
-                        onClick={() => openEditModal(t)}
-                    >
-                        <button
-                            className={`checkbox ${t.completed ? 'checked' : ''}`}
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                TodoCompleted(t.id);
-                            }}
-                        />
-                        <div className="todo-text">{t.text}</div>
-                        <div
-                            className="todo-category"
-                            style={Categories[t.category]}
-                        >
-                            {t.category}
-                        </div>
-                    </div>
-                ))}
-            </div>
-            <TodoModal
-                isOpen={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
-                onSave={handledSaveTodo}
-                onDelete={handledDeleteTodo}
-                initialTodo={editingTodo}
-                categories={Categories}
-            />
+  return (
+    <section className="todo-container" aria-labelledby="todo-title">
+      <div className="todo-header">
+        <div>
+          <h2 className="todo-title" id="todo-title">To do List</h2>
+          <time className="todo-date" dateTime={dateKey}>{dateKey}</time>
         </div>
-    );
-};
-
-export default Todo;
+        <button
+          className="todo-add"
+          type="button"
+          aria-label="할 일 카테고리 보기"
+          aria-haspopup="dialog"
+          onClick={() => setIsModalOpen(true)}
+        >
+          +
+        </button>
+      </div>
+      <TodoResourceStatus resource={resource} label="할 일 목록을" />
+      {saving && <p role="status">완료 상태를 저장하는 중…</p>}
+      {saveFailed && <p role="alert">완료 상태를 저장하지 못했습니다. 체크박스를 다시 눌러 주세요.</p>}
+      {resource.data?.length === 0 && <p>선택한 날짜에 할 일이 없습니다.</p>}
+      <div className="todo-list">
+        {resource.data?.map((todo) => (
+          <div key={todo.todoId} className={`todo-item ${todo.completed ? "done" : ""}`}>
+            <button
+              className={`checkbox ${todo.completed ? "checked" : ""}`}
+              type="button"
+              role="checkbox"
+              aria-checked={todo.completed}
+              aria-label={todo.description}
+              disabled={saving}
+              onClick={() => onChangeCompletion(todo)}
+            />
+            <div className="todo-text">{todo.description}</div>
+            <div
+              className="todo-category"
+              style={{ backgroundColor: categoryColors[todo.categoryName] || "#F1F1F1" }}
+            >
+              {todo.categoryName}
+            </div>
+          </div>
+        ))}
+      </div>
+      {isModalOpen && <TodoModal onClose={() => setIsModalOpen(false)} />}
+    </section>
+  );
+}
