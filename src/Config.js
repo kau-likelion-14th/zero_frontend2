@@ -1,5 +1,11 @@
 const config = {
   API_URL: "",
+  TODO: {
+    LIST: "/api/todos",
+    CALENDAR: "/api/todos/calendar",
+    COMPLETE: (id, date) => `/api/todos/${encodeURIComponent(id)}/dates/${date}/complete`,
+    CATEGORIES: "/api/categories",
+  },
   FOLLOW: {
     PROFILE: (id) => `/api/follow/${encodeURIComponent(id)}`,
     TODOS: (id) => `/api/follow/${encodeURIComponent(id)}/todos`,

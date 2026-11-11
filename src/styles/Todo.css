@@ -109,6 +109,91 @@
   text-align: center;
 }
 
+.todo-category-dialog {
+  border: 0;
+  max-width: calc(100% - 32px);
+  max-height: calc(100% - 32px);
+  gap: 24px;
+}
+
+.todo-category-dialog:not([open]) {
+  display: none;
+}
+
+.todo-category-dialog::backdrop {
+  background: rgb(0 0 0 / 28%);
+}
+
+.todo-category-dialog .modal-title,
+.todo-category-dialog p {
+  margin: 0;
+}
+
+.todo-category-options {
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  padding: 0;
+  margin: 0;
+}
+
+.todo-category-options .modal-categoryitem {
+  min-width: 0;
+}
+
+.todo-category-options .modal-categoryitem span {
+  padding: 6px 12px;
+  border-radius: 20px;
+  background: #eaf4ff;
+  color: #19568d;
+}
+
+.todo-text-button {
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.todo-text-button:hover {
+  text-decoration: underline;
+}
+
+.todo-modal-header {
+  position: relative;
+  padding-inline: 34px;
+}
+
+.todo-modal-close {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-end: 0;
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: 8px;
+  background: #f2f2f2;
+  color: #333;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.todo-category-dialog .routine-row:disabled,
+.todo-category-dialog .modal-actions button:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.todo-category-note {
+  color: #525d6b;
+  font-size: 14px;
+  text-align: center;
+}
+
 .modal-section {
   display: flex;
   flex-direction: column;

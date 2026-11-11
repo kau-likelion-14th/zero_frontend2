@@ -1,124 +1,87 @@
-import React, {useEffect, useState} from "react";
-import "../../styles/Todo.css";
-import RoutineModal from "./RoutineModal";
+import { useEffect, useRef, useState } from "react";
+import { getCategories } from "./todoApi";
+import useTodoResource from "./useTodoResource";
+import TodoResourceStatus from "./TodoResourceStatus";
 
-const TodoModal = ({ 
-    isOpen, 
-    onClose, 
-    onSave, 
-    onDelete, 
-    initialTodo,
-    categories
-}) => {
-    const isEditMode = Boolean(initialTodo); 
+export default function TodoModal({ todo, onClose }) {
+  const dialogRef = useRef(null);
+  const categories = useTodoResource(getCategories, "categories");
+  const [categoryId, setCategoryId] = useState(null);
+  const initialCategory = todo
+    ? categories.data?.find(({ categoryName }) => categoryName === todo.categoryName)
+    : categories.data?.[0];
+  const selectedId = categoryId ?? initialCategory?.categoryId;
 
-    const [category, setCategory] = useState("공부"); 
-    const [text, setText] = useState("");
-    const [routine, setRoutine] = useState(null);
+  useEffect(() => {
+    const dialog = dialogRef.current;
+    dialog.showModal();
+    return () => dialog.close();
+  }, []);
 
-    const [isRoutineModalOpen, setIsRoutineModalOpen] = useState(false);
+  function closeDialog() {
+    dialogRef.current.close();
+    onClose();
+  }
 
-    useEffect(() => {
-        if (!isOpen) return;
-
-        setCategory(initialTodo?.category || "공부");
-        setText(initialTodo?.text || "");
-        setRoutine(initialTodo?.routine || null);
-    }, [isOpen, initialTodo]);
-
-    if (!isOpen) return null;
-
-    const handleSave = () => {
-        if(!text.trim()) return;
-
-        onSave({ 
-            text: text.trim(), 
-            category,
-            routine,
-        });
-    };
-
-    const categoryKeys = Object.keys(categories);
-
-    return (
-        <div className="modal-overlay" onClick={onClose}> 
-            <div 
-                className="modal-container" 
-                onClick={(e) => e.stopPropagation()}
-            >
-                <div className="modal-title">
-                    {isEditMode ? "할 일 수정하기" : "할 일 추가하기"}
-                </div>
-                <div className="modal-section">
-                    <div className="modal-label">카테고리</div>
-                    <div className="modal-categories">
-                        {categoryKeys.map((c) => (
-                            <label
-                                key={c}
-                                className={`modal-categoryitem ${category === c ? 'selected' : ''}`}
-                            >
-                                <span style={categories[c]}>{c}</span> 
-                                <input
-                                    type="radio"
-                                    name="category"
-                                    value={c}
-                                    checked={category === c}
-                                    onChange={() => setCategory(c)}
-                                />
-                            </label>
-                        ))}
-                    </div>
-                </div>
-                <div className="modal-section">
-                    <div className="modal-label">내용</div>
-                    <div className="input-wrapper">
-                        <input
-                            type="text"
-                            className="text-input"
-                            placeholder="내용을 입력해주세요"
-                            value={text}
-                            onChange={(e) => setText(e.target.value)}
-                        />
-                    </div>
-                </div>
-                <div className="modal-section">
-                    <button
-                        type="button"
-                        className="routine-row"
-                        onClick={() => setIsRoutineModalOpen(true)}
-                    >
-                        <div className="routine-label">루틴 등록하기</div>
-                        <div className="routine-button">{"›"}</div>
-                    </button>
-                </div>
-                <div className="modal-actions">
-                    <button
-                        className={`leftbutton ${isEditMode ? '' : 'disabled'}`}
-                        onClick={onDelete}
-                        disabled={!isEditMode}
-                    >
-                        삭제
-                    </button>
-                    <button
-                        className={`rightbutton ${text.trim() ? '' : 'disabled'}`}
-                        onClick={handleSave}
-                        disabled={!text.trim()}
-                    >
-                        저장
-                    </button>
-                </div>
-                <RoutineModal
-                    isOpen={isRoutineModalOpen}
-                    initialRoutine={routine}
-                    onClose={() => setIsRoutineModalOpen(false)}
-                    onSave={(newRoutine) => {
-                        setRoutine(newRoutine);
-                        setIsRoutineModalOpen(false);
-                    }}
+  return (
+    <dialog
+      ref={dialogRef}
+      className="modal-container todo-category-dialog"
+      aria-labelledby="todo-modal-title"
+      onCancel={(event) => {
+        event.preventDefault();
+        closeDialog();
+      }}
+    >
+      <div className="todo-modal-header">
+        <h2 className="modal-title" id="todo-modal-title">
+          {todo ? "할 일 수정하기" : "할 일 추가하기"}
+        </h2>
+        <button type="button" className="todo-modal-close" aria-label="닫기" onClick={closeDialog}>
+          ×
+        </button>
+      </div>
+      <div className="modal-section">
+        <div className="modal-label" id="todo-category-label">카테고리</div>
+        <TodoResourceStatus resource={categories} label="카테고리를" />
+        {categories.data?.length === 0 && <p>등록된 카테고리가 없습니다.</p>}
+        {categories.data?.length > 0 && (
+          <div className="modal-categories todo-category-options" role="radiogroup" aria-labelledby="todo-category-label">
+            {categories.data.map(({ categoryId, categoryName }) => (
+              <label key={categoryId} className="modal-categoryitem">
+                <span>{categoryName}</span>
+                <input
+                  type="radio"
+                  name="todo-category"
+                  checked={selectedId === categoryId}
+                  onChange={() => setCategoryId(categoryId)}
                 />
-            </div>
+              </label>
+            ))}
+          </div>
+        )}
+      </div>
+      <div className="modal-section">
+        <label className="modal-label" htmlFor="todo-description">내용</label>
+        <div className="input-wrapper">
+          <input
+            id="todo-description"
+            className="text-input"
+            type="text"
+            placeholder="내용을 입력해주세요"
+            defaultValue={todo?.description ?? ""}
+          />
         </div>
-    );
-};
-
-export default TodoModal;
+      </div>
+      <button type="button" className="routine-row" disabled>
+        <span className="routine-label">루틴 등록하기</span>
+        <span className="routine-button" aria-hidden="true">›</span>
+      </button>
+      <div className="modal-actions">
+        <button type="button" className="leftbutton disabled" disabled>삭제</button>
+        <button type="button" className="rightbutton disabled" disabled>저장</button>
+      </div>
+      <p className="todo-category-note">입력한 내용과 카테고리는 이 화면에서 미리 볼 수 있습니다.</p>
+    </dialog>
+  );
+}

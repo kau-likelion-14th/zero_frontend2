@@ -7,6 +7,45 @@
   font-family: 'Paperlogy', sans-serif;
 }
 
+.mainpage-container .calendar-container {
+  width: min(100%, 440px);
+  align-self: flex-start;
+}
+
+.mainpage-container .calendar-container .tile-meta {
+  color: #1765a8;
+}
+
+.mainpage-container .todo-title {
+  margin: 0;
+}
+
+.mainpage-container .todo-date {
+  display: block;
+  margin-top: 4px;
+  color: #525d6b;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.mainpage-container .todo-item {
+  cursor: default;
+}
+
+.mainpage-container .todo-text {
+  overflow-wrap: anywhere;
+}
+
+.mainpage-container .checkbox:not(.checked) {
+  border-color: #717b86;
+  background: white;
+}
+
+.mainpage-container .checkbox:disabled {
+  cursor: wait;
+  opacity: 0.6;
+}
+
 .calendar-container .react-calendar {
   border: none;
   font-family: 'Paperlogy', sans-serif;
@@ -26,6 +65,15 @@
     flex-direction: column;
     align-items: center;    
     margin: 0;
+    padding: 48px 16px;
+    gap: 32px;
+  }
+
+  .mainpage-container .calendar-container,
+  .mainpage-container .todo-container {
+    align-self: center;
+    box-sizing: border-box;
+    max-width: 440px;
   }
 
   .calendar-container .react-calendar {

@@ -1,66 +1,49 @@
-import Calendar from 'react-calendar';
-import 'react-calendar/dist/Calendar.css';
-import React, { useState } from 'react';
+import Calendar from "react-calendar";
+import "react-calendar/dist/Calendar.css";
 import "../../styles/Calendar.css";
-
-const toDateKey = (date) => {
-    const y = date.getFullYear();
-    const m = String(date.getMonth() + 1).padStart(2, "0");
-    const d = String(date.getDate()).padStart(2, "0");
-    return `${y}-${m}-${d}`;
-};
+import { toDateKey } from "./todoApi";
+import TodoResourceStatus from "./TodoResourceStatus";
 
 export default function CustomCalendar({
-    initialDate = new Date(),
-    onDateChange,
-    todosByDate = {},
+  selectedDate, activeMonth, onDateChange, onMonthChange, resource,
 }) {
-    const [selectedDate, setSelectedDate] = useState(initialDate);
+  const getDay = (date) => resource.data?.[toDateKey(date)];
 
-    const handledDateChange = (value) => {
-        const next = value instanceof Date ? value : value?.[0];
-        setSelectedDate(next);
-        onDateChange?.(next);
-    };
+  return (
+    <section className="calendar-container" aria-label="할 일 캘린더">
+      <Calendar
+        value={selectedDate}
+        activeStartDate={activeMonth}
+        onChange={onDateChange}
+        onActiveStartDateChange={({ activeStartDate }) => onMonthChange(activeStartDate)}
+        locale="ko-KR"
+        calendarType="gregory"
+        view="month"
+        prevAriaLabel="이전 달"
+        nextAriaLabel="다음 달"
+        prev2Label={null}
+        next2Label={null}
+        formatDay={(_, date) => String(date.getDate())}
+        tileContent={({ date }) => {
+          const day = getDay(date);
+          if (!day?.hasTodo) return null;
 
-    const getDayMeta = (date) => {
-        const key = toDateKey(date);
-        const list = todosByDate[key] ?? [];
-        if (list.length === 0) return { hasTodos: false, remaining: 0, allDone: false };
-
-        const remaining = list.filter((t) => !t.completed).length;
-        return { hasTodos: true, remaining, allDone: remaining === 0 };
-    };
-
-    return (
-        <div className="calendar-container">
-            <Calendar
-                onChange={handledDateChange}
-                value={selectedDate}
-                calendarType='gregory'
-                view='month'
-                prev2Label={null}
-                next2Label={null}
-                showNeighboringMonth={true}
-                formatDay={(locale, date) => String(date.getDate())}
-                tileContent={({ date, view }) => {
-                    if (view !== 'month') return null;
-                    const { hasTodos, remaining, allDone } = getDayMeta(date);
-                    if (!hasTodos) return null;
-
-                    return (
-                        <div className="tile-meta">
-                            {allDone ? "★" : remaining}
-                        </div>
-                    );
-                }}
-                tileClassName={({ date, view }) => {
-                    if (view !== 'month') return "";
-                    const { hasTodos, allDone } = getDayMeta(date);
-                    if (!hasTodos) return "";
-                    return allDone ? "tile-done" : "tile-has";
-                }}
-            />
-        </div>
-    );
+          return (
+            <span
+              className="tile-meta"
+              aria-label={day.remaining === 0 ? "모든 할 일 완료" : `남은 할 일 ${day.remaining}개`}
+            >
+              {day.remaining === 0 ? "★" : day.remaining}
+            </span>
+          );
+        }}
+        tileClassName={({ date }) => {
+          const day = getDay(date);
+          if (!day?.hasTodo) return "";
+          return day.remaining === 0 ? "tile-done" : "tile-has";
+        }}
+      />
+      <TodoResourceStatus resource={resource} label="캘린더를" />
+    </section>
+  );
 }
