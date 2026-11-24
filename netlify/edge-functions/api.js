@@ -1,4 +1,5 @@
 const forwardedHeaders = ["accept", "authorization", "content-type", "cookie"];
+const developmentApi = "http://lte-dev-env.eba-hgqx3mfp.ap-northeast-2.elasticbeanstalk.com";
 
 function unavailable() {
   return Response.json(
@@ -15,8 +16,9 @@ export default async function proxyApi(request) {
   }
 
   try {
-    const upstream = new URL(Netlify.env.get("LTE_API_ORIGIN"));
-    if (upstream.protocol !== "https:" || upstream.origin === incoming.origin ||
+    const upstream = new URL(Netlify.env.get("LTE_API_ORIGIN") || developmentApi);
+    if ((upstream.protocol !== "https:" && upstream.origin !== developmentApi) ||
+        upstream.origin === incoming.origin ||
         upstream.username || upstream.password) {
       return unavailable();
     }

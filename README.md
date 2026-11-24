@@ -25,9 +25,9 @@ AUTH_COOKIE_SAME_SITE=Lax
 1. GitHub 프론트 저장소를 Netlify에 연결합니다. `netlify.toml`이 빌드,
    React 경로 새로고침, 동일 출처의 `/api/*` 프록시를 설정합니다.
 2. Netlify의 Builds 범위에 `REACT_APP_KAKAO_REST_API_KEY`를 설정합니다.
-   Functions 범위에는 TLS가 활성화된 Spring 서버의 출처를
-   `LTE_API_ORIGIN=https://<백엔드-호스트>`로 설정합니다.
-   로그인 요청과 인증 쿠키는 이 HTTPS 연결을 통해 전달됩니다.
+   프록시는 저장소에서 사용하는 Elastic Beanstalk 개발 API에 연결합니다.
+   이 서버는 HTTP로 응답합니다. TLS가 설정된 Spring 서버를 사용할 경우
+   Functions 범위에 `LTE_API_ORIGIN=https://<백엔드-호스트>`를 설정합니다.
 3. 카카오 Developers에서 Netlify 사이트 출처를 웹 도메인으로,
    아래의 전체 콜백 URI를 REST API 키의 리디렉션 URI로 등록합니다.
 4. 백엔드 GitHub Actions의 기존 `LTE_ENV`에서 아래 항목을 수정하고,
