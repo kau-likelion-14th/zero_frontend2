@@ -1,9 +1,9 @@
 .mainpage-container {
   display: flex;
   justify-content: center;
-  align-items: center;
-  padding: 120px 0px;
-  gap: 200px;
+  align-items: flex-start;
+  padding: 120px 24px;
+  gap: clamp(40px, 13vw, 200px);
   font-family: 'Paperlogy', sans-serif;
 }
 
@@ -57,7 +57,8 @@
 .todo-container {
   width: 100%;
   max-width: 440px;
-  align-self: flex-start; 
+  align-self: flex-start;
+  box-sizing: border-box;
 }
 
 @media (max-width: 1024px) { 
@@ -65,7 +66,7 @@
     flex-direction: column;
     align-items: center;    
     margin: 0;
-    padding: 48px 16px;
+    padding: 112px 16px 48px;
     gap: 32px;
   }
 
@@ -87,14 +88,37 @@
 
 
 @media (max-width: 480px) {
-  .modal-container {
-    width: 90%; 
+  .mainpage-container {
+    padding-top: 126px;
+  }
+
+  .mainpage-container .todo-container {
+    padding: 12px 0;
+  }
+
+  .mainpage-container .todo-item {
+    padding-inline: 4px;
+  }
+
+  .mainpage-container .todo-category {
+    padding-inline: 10px;
+  }
+
+  .todo-category-dialog {
     padding: 20px;
   }
 
-  .text-input {
-    width: 100%; 
-    box-sizing: border-box;
+  .todo-category-dialog .modal-title {
+    font-size: 22px;
+  }
+
+  .calendar-container .react-calendar__tile {
+    height: 66px;
+    padding-inline: 0;
+  }
+
+  .calendar-container .tile-meta {
+    bottom: 12px;
   }
 
   .leftbutton, .rightbutton, .leftbutton2 {
@@ -107,9 +131,4 @@
     flex-direction: column; 
     gap: 10px;
   }
-}
-
-.todo-header{
-  font-size: 35px;
-  font-weight: 600;
 }

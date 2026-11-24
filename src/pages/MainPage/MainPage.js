@@ -27,6 +27,11 @@ export default function MainPage() {
     setFailedDate(null);
   }
 
+  function refreshTodos() {
+    setRevision((previous) => previous + 1);
+    setFailedDate(null);
+  }
+
   async function changeCompletion(todo) {
     if (saveInProgress.current) return;
 
@@ -35,7 +40,7 @@ export default function MainPage() {
     setFailedDate(null);
     try {
       await setTodoCompleted(todo.todoId, dateKey, !todo.completed);
-      setRevision((previous) => previous + 1);
+      refreshTodos();
     } catch {
       setFailedDate(dateKey);
     } finally {
@@ -59,6 +64,7 @@ export default function MainPage() {
         saving={saving}
         saveFailed={failedDate === dateKey}
         onChangeCompletion={changeCompletion}
+        onChangeTodo={refreshTodos}
       />
     </div>
   );

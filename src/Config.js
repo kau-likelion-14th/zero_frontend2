@@ -1,9 +1,10 @@
 const config = {
-  API_URL: "",
+  API_URL: process.env.NODE_ENV === "development" ? process.env.REACT_APP_API_URL || "" : "",
   TODO: {
     LIST: "/api/todos",
+    DETAIL: (id) => `/api/todos/${encodeURIComponent(id)}`,
+    OCCURRENCE: (id, date) => `/api/todos/${encodeURIComponent(id)}/dates/${date}`,
     CALENDAR: "/api/todos/calendar",
-    COMPLETE: (id, date) => `/api/todos/${encodeURIComponent(id)}/dates/${date}/complete`,
     CATEGORIES: "/api/categories",
   },
   FOLLOW: {

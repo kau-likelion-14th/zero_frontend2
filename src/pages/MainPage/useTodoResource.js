@@ -6,6 +6,8 @@ export default function useTodoResource(load, key, revision = 0) {
   const requestKey = `${key}/${revision}/${attempt}`;
 
   useEffect(() => {
+    if (key == null) return;
+
     const controller = new AbortController();
     setResult(null);
 
@@ -24,7 +26,7 @@ export default function useTodoResource(load, key, revision = 0) {
   const current = result?.requestKey === requestKey ? result : null;
   return {
     data: current?.data,
-    loading: !current,
+    loading: key != null && !current,
     failed: current?.failed,
     retry: () => setAttempt((value) => value + 1),
   };

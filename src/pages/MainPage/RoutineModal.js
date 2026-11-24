@@ -1,101 +1,66 @@
-import React, { useEffect, useState } from "react";
-import "../../styles/Todo.css";
+import { useState } from "react";
 
-const Days = ["월", "화", "수", "목", "금", "토", "일"];
+export const routineDays = [
+  ["MON", "월"], ["TUE", "화"], ["WED", "수"], ["THU", "목"],
+  ["FRI", "금"], ["SAT", "토"], ["SUN", "일"],
+];
 
-const RoutineModal = ({
-    isOpen,
-    onClose,
-    onSave,
-    initialRoutine,
-}) => {
-    const [startDate, setStartDate] = useState("");
-    const [endDate, setEndDate] = useState("");
-    const [repeatDays, setRepeatDays] = useState(null);
+export default function RoutineModal({ date, initialRoutine, canRemove, onClose, onSave }) {
+  const [error, setError] = useState("");
 
-    useEffect(() => {
-        if (!isOpen) return;
+  function save(event) {
+    event.preventDefault();
+    const { startDate, endDate, week } = Object.fromEntries(new FormData(event.currentTarget));
+    if (endDate < startDate) {
+      setError("종료 날짜는 시작 날짜와 같거나 그 이후여야 합니다.");
+      return;
+    }
 
-        setStartDate(initialRoutine?.startDate || "");
-        setEndDate(initialRoutine?.endDate || "");
-        setRepeatDays(initialRoutine?.repeatDays ?? null);
-    }, [isOpen, initialRoutine]);
+    const repeatDay = routineDays.findIndex(([day]) => day === week);
+    const start = new Date(`${startDate}T00:00:00Z`);
+    const offset = (repeatDay + 8 - start.getUTCDay()) % 7;
+    start.setUTCDate(start.getUTCDate() + offset);
+    if (start > new Date(`${endDate}T00:00:00Z`)) {
+      setError("선택한 기간에 반복 요일이 없습니다. 날짜 또는 요일을 확인해 주세요.");
+      return;
+    }
 
-    if (!isOpen) return null;
+    onSave({ startDate, endDate, week });
+  }
 
-    const handleSave = () => {
-        onSave({
-            startDate,
-            endDate,
-            repeatDays,
-        });
-    };
-
-    return (
-        <div className="modal-overlay" onClick={onClose}>
-            <div
-                className="modal-container"
-                onClick={(e) => e.stopPropagation()}
-            >
-                <div className="routine-header">
-                    <div className="routine-close" onClick={onClose}>{"‹"}</div>
-                    <div className="routine-title">루틴 등록하기</div>
-                </div>
-
-                <div className="modal-section">
-                    <div className="modal-label">시작 날짜</div>
-                    <div className="date-wrapper">
-                        <input
-                            type="date"
-                            className="date-input"
-                            value={startDate}
-                            onChange={(e) => setStartDate(e.target.value)}
-                        />
-                        <div className="date-initial">{startDate || "없음"}</div>
-                    </div>
-                </div>
-
-                <div className="modal-section">
-                    <div className="modal-label">종료 날짜</div>
-                    <div className="date-wrapper">
-                        <input
-                            type="date"
-                            className="date-input"
-                            value={endDate}
-                            onChange={(e) => setEndDate(e.target.value)}
-                        />
-                        <div className="date-initial">{endDate || "없음"}</div>
-                    </div>
-                </div>
-
-                <div className="modal-section">
-                    <div className="modal-label">반복</div>
-                    <div className="modal-categories">
-                        {Days.map((day, idx) => (
-                            <label
-                                key={day}
-                                className={`modal-categoryitem ${repeatDays === idx ? "on" : ""}`}
-                            >
-                                <span>{day}</span>
-                                <input
-                                    type="radio"
-                                    name="repeatDays"
-                                    value={idx}
-                                    checked={repeatDays === idx}
-                                    onChange={() => setRepeatDays(idx)}
-                                />
-                            </label>
-                        ))}
-                    </div>
-                </div>
-
-                <div className="modal-actions">
-                    <button className="leftbutton2" onClick={onClose}>취소</button>
-                    <button className="rightbutton" onClick={handleSave}>저장</button>
-                </div>
-            </div>
+  return (
+    <form className="todo-modal-form" onSubmit={save}>
+      <div className="todo-modal-header">
+        <h2 className="modal-title" id="todo-modal-title">루틴 {initialRoutine ? "수정하기" : "등록하기"}</h2>
+        <button type="button" className="todo-modal-close" aria-label="돌아가기" data-dialog-focus onClick={onClose}>
+          ×
+        </button>
+      </div>
+      <div className="modal-section">
+        <label className="modal-label" htmlFor="routine-start">시작 날짜</label>
+        <input id="routine-start" name="startDate" type="date" className="date-input" required defaultValue={initialRoutine?.startDate || date} />
+      </div>
+      <div className="modal-section">
+        <label className="modal-label" htmlFor="routine-end">종료 날짜</label>
+        <input id="routine-end" name="endDate" type="date" className="date-input" required defaultValue={initialRoutine?.endDate || ""} />
+      </div>
+      <div className="modal-section">
+        <div className="modal-label" id="routine-week-label">반복 요일</div>
+        <div className="modal-categories todo-category-options" role="radiogroup" aria-labelledby="routine-week-label">
+          {routineDays.map(([day, label]) => (
+            <label key={day} className="modal-categoryitem">
+              <span>{label}</span>
+              <input type="radio" name="week" value={day} required defaultChecked={initialRoutine?.week === day} />
+            </label>
+          ))}
         </div>
-    );
-};
-
-export default RoutineModal;
+      </div>
+      {error && <p role="alert">{error}</p>}
+      <div className="modal-actions">
+        <button type="button" className="leftbutton2" onClick={onClose}>취소</button>
+        {canRemove && <button type="button" className="leftbutton" onClick={() => onSave(null)}>루틴 해제</button>}
+        <button type="submit" className="rightbutton">저장</button>
+      </div>
+    </form>
+  );
+}

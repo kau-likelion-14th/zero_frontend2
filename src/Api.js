@@ -17,7 +17,7 @@ export const renewAccessToken = () => {
       .post(
         config.AUTH.REISSUE,
         {},
-        { withCredentials: true }
+        { baseURL: config.API_URL, withCredentials: true }
       )
       .then(({ data }) => {
         const token = data?.result;
