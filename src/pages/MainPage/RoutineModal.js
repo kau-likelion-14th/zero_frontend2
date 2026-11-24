@@ -46,7 +46,7 @@ export default function RoutineModal({ date, initialRoutine, canRemove, onClose,
       </div>
       <div className="modal-section">
         <div className="modal-label" id="routine-week-label">반복 요일</div>
-        <div className="modal-categories todo-category-options" role="radiogroup" aria-labelledby="routine-week-label">
+        <div className="modal-categories todo-category-options routine-week-options" role="radiogroup" aria-labelledby="routine-week-label">
           {routineDays.map(([day, label]) => (
             <label key={day} className="modal-categoryitem">
               <span>{label}</span>

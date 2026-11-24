@@ -148,6 +148,19 @@
   color: #19568d;
 }
 
+.modal-categories.routine-week-options {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 4px;
+}
+
+.routine-week-options .modal-categoryitem span {
+  width: 100%;
+  box-sizing: border-box;
+  padding-inline: 0;
+  text-align: center;
+}
+
 .todo-text-button {
   min-width: 0;
   padding: 0;
