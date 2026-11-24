@@ -27,7 +27,7 @@ test("카카오 콜백은 state 확인 후 코드를 전송하고 토큰을 저�
   } } });
   renderCallback("matching-state");
   expect(await screen.findByText("홈 화면")).toBeInTheDocument();
-  expect(axios.post).toHaveBeenCalledWith("/api/auth/kakao", { code: "test-code" }, { withCredentials: true });
+  expect(axios.post).toHaveBeenCalledWith("/api/auth/kakao", { code: "test-code" }, { baseURL: "", withCredentials: true });
   expect(localStorage.getItem("accessToken")).toBe("test-token");
   expect(JSON.parse(localStorage.getItem("user")).username).toBe("테스트");
   expect(sessionStorage.getItem("kakaoOAuthState")).toBeNull();

@@ -1,0 +1,12 @@
+[build]
+  command = "npm run build"
+  publish = "build"
+
+[[edge_functions]]
+  function = "api"
+  path = "/api/*"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

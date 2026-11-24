@@ -72,7 +72,7 @@ function LoginPage() {
       .post(
         config.AUTH.KAKAO,
         { code },
-        { withCredentials: true }
+        { baseURL: config.API_URL, withCredentials: true }
       )
       .then(({ data }) => {
         const result = data?.result;

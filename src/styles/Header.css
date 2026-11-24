@@ -90,3 +90,66 @@
     height: 20px;
     cursor: pointer;
 }
+
+@media (max-width: 820px) {
+    .header {
+        left: 16px;
+        right: 16px;
+        padding-inline: 18px;
+    }
+
+    .header-left, .header-right {
+        margin: 0;
+    }
+
+    .header-nav {
+        position: static;
+        transform: none;
+        gap: 18px;
+    }
+
+    .header-title, .user-name, .nav-item {
+        font-size: 15px;
+    }
+
+    .user-name {
+        max-width: 100px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+}
+
+@media (max-width: 540px) {
+    .header {
+        height: auto;
+        min-height: 92px;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        row-gap: 8px;
+        padding-block: 10px;
+        border-radius: 24px;
+    }
+
+    .header-nav {
+        grid-column: 1 / -1;
+        grid-row: 2;
+        justify-content: center;
+        gap: 24px;
+    }
+
+    .header-title {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .header-logo {
+        width: 28px;
+        height: 28px;
+    }
+
+    .user-name {
+        max-width: 64px;
+    }
+}

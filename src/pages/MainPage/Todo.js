@@ -12,7 +12,7 @@ const categoryColors = {
   취미: "#FFF0D6",
 };
 
-export default function Todo({ dateKey, resource, saving, saveFailed, onChangeCompletion }) {
+export default function Todo({ dateKey, resource, saving, saveFailed, onChangeCompletion, onChangeTodo }) {
   const [modal, setModal] = useState(null);
 
   return (
@@ -27,7 +27,8 @@ export default function Todo({ dateKey, resource, saving, saveFailed, onChangeCo
           type="button"
           aria-label="할 일 추가하기"
           aria-haspopup="dialog"
-          onClick={() => setModal({})}
+          disabled={saving}
+          onClick={() => setModal({ date: dateKey })}
         >
           +
         </button>
@@ -53,7 +54,8 @@ export default function Todo({ dateKey, resource, saving, saveFailed, onChangeCo
               type="button"
               aria-label={`할 일 수정하기: ${todo.description}`}
               aria-haspopup="dialog"
-              onClick={() => setModal({ todo })}
+              disabled={saving}
+              onClick={() => setModal({ todoId: todo.todoId, date: dateKey })}
             >
               {todo.description}
             </button>
@@ -66,7 +68,15 @@ export default function Todo({ dateKey, resource, saving, saveFailed, onChangeCo
           </div>
         ))}
       </div>
-      {modal && <TodoModal todo={modal.todo} onClose={() => setModal(null)} />}
+      {modal && (
+        <TodoModal
+          key={modal.todoId ?? "new"}
+          todoId={modal.todoId}
+          date={modal.date}
+          onClose={() => setModal(null)}
+          onChangeTodo={onChangeTodo}
+        />
+      )}
     </section>
   );
 }
