@@ -59,6 +59,8 @@
     color: #111;
     flex: 1;
     align-self: center;
+    min-width: 0;
+    overflow-wrap: anywhere;
 }
 
 .profile-save-btn {
@@ -75,7 +77,12 @@
     margin-left: auto;
 }
 
-.profile-save-btn:hover { background: #2176c7; }
+.profile-save-btn:hover:enabled { background: #2176c7; }
+
+.mypage-container button:disabled {
+    opacity: .6;
+    cursor: default;
+}
 
 .profile-inputs {
     display: flex;
@@ -115,6 +122,7 @@
     padding: 0 14px;
     background: #ffffff;
     gap: 8px;
+    box-sizing: border-box;
 }
 
 .song-icon {
@@ -125,6 +133,7 @@
 
 .song-input {
     flex: 1;
+    min-width: 0;
     border: none;
     outline: none;
     font-size: 14px;
@@ -143,6 +152,23 @@
     padding: 0;
     display: flex;
     align-items: center;
+}
+
+.song-search-results {
+    display: grid;
+    gap: 6px;
+    max-width: 500px;
+}
+
+.song-search-item {
+    padding: 10px 14px;
+    border: 1px solid #d8d8d8;
+    border-radius: 8px;
+    background: #fff;
+    color: #222;
+    text-align: left;
+    overflow-wrap: anywhere;
+    cursor: pointer;
 }
 
 .status-section {
@@ -182,4 +208,19 @@
 .stat-unit {
     font-size: 17px;
     font-weight: 400;
+}
+
+@media (max-width: 760px) {
+    .mypage-container { padding: 0 20px; }
+    .profile-top { flex-wrap: wrap; gap: 16px; }
+    .profile-img-wrap { width: 112px; height: 112px; }
+    .profile-img { width: 82px; height: 82px; }
+    .profile-save-btn { padding: 12px 24px; }
+}
+
+@media (max-width: 540px) {
+    .mypage-container { margin-top: 126px; }
+    .profile-save-btn { flex-basis: 100%; }
+    .status-section { flex-direction: column; }
+    .stat-card { padding: 20px; }
 }
